@@ -30,7 +30,7 @@ export default class NewBill {
       // Check MIME type
       const allowedMimeTypes = ['image/jpeg', 'image/png']
       if (!allowedMimeTypes.includes(fileType)) {
-        return reject('Invalid file type. Please select a valid image file.')
+        return reject('Invalid file type. Please select a .jpg, .jpeg, or .png file.')
       }
 
       // Verify binary signature (magic number)
@@ -119,7 +119,9 @@ export default class NewBill {
       fileName: this.fileName,
       status: 'pending'
     }
-    this.updateBill(bill)
+    if (this.store) {
+      this.updateBill(bill);
+    }
     this.onNavigate(ROUTES_PATH['Bills'])
   }
 
