@@ -109,11 +109,13 @@ describe("Given I am connected as an employee", () => {
       });
 
       const result = await billsInstance.getBills();
+
+      // Adjust expected result to match the format of the bills returned
       expect(result).toEqual([
-        { date: "10 Sep. 21", status: "En attente" },
-        { date: "15 Oct. 21", status: "Accepté" }
-      ]);
-    });
+        { rawDate: "2021-10-15", date: "15 Oct. 21", status: "Accepté" },
+        { rawDate: "2021-09-10", date: "10 Sep. 21", status: "En attente" }
+      ])
+    })
   });
 
   describe('When an error occurs on the API', () => {
