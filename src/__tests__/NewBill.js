@@ -144,4 +144,70 @@ describe("Given I am connected as an employee", () => {
       consoleErrorSpy.mockRestore();
     });
   });
+
+  describe("When I submit a new bill", () => {
+    beforeEach(() => {
+      document.body.innerHTML = `
+        <div id="root">
+          <form data-testid="form-new-bill">
+            <input data-testid="datepicker" value="2024-01-01" />
+            <select data-testid="expense-type">
+              <option value="Transports">Transports</option>
+            </select>
+            <input data-testid="expense-name" value="Flight ticket" />
+            <input data-testid="amount" value="150" />
+            <input data-testid="vat" value="30" />
+            <input data-testid="pct" value="20" />
+            <textarea data-testid="commentary">Conference trip</textarea>
+            <input data-testid="file" />
+            <button type="submit">Submit</button>
+          </form>
+        </div>
+      `;
+
+      localStorage.setItem("user", JSON.stringify({ email: "test@example.com" }));
+    });
+
+    test("Then it should call handleSubmit and navigate to Bills page", () => {
+      const onNavigate = jest.fn();
+      const store = {
+        bills: jest.fn(() => ({
+          update: jest.fn().mockResolvedValue({}),
+        })),
+      };
+
+      const newBill = new NewBill({
+        document,
+        onNavigate,
+        store,
+        localStorage: window.localStorage
+      });
+
+      // Spy on the handleSubmit method
+      const handleSubmitSpy = jest.spyOn(newBill, 'handleSubmit');
+
+      // Ensure updateBill is called correctly
+      newBill.updateBill = jest.fn();
+
+      // Attach the event listener to the form manually
+      const form = screen.getByTestId("form-new-bill");
+      form.addEventListener("submit", newBill.handleSubmit);
+
+      // Debugging
+      console.log('form', form);
+      console.log('handleSubmitSpy', handleSubmitSpy);
+
+      // Simulate form submission
+      fireEvent.submit(form);
+
+      // Verify if handleSubmit was called
+      expect(handleSubmitSpy).toHaveBeenCalled();
+
+      // Verify if updateBill was called
+      expect(newBill.updateBill).toHaveBeenCalled();
+
+      // Verify if onNavigate was called with the correct path
+      expect(onNavigate).toHaveBeenCalledWith(ROUTES_PATH.Bills);
+    });
+  });
 });
